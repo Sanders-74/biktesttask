@@ -1,0 +1,64 @@
+services:
+  cassandra1:
+    image: docker.io/bitnami/cassandra:latest
+    hostname: cassandra1
+    ports:
+      - '7001:7000'
+      - '9042:9042'
+    restart: on-failure  
+    networks:
+      localnet:
+        ipv4_address: 192.168.1.200  
+    volumes:
+      - 'cassandra_data1:/bitnami'
+      - ./cassandra/config/cassandra.conf:/etc/collectd/collectd.conf 
+
+  cassandra2:
+    image: docker.io/bitnami/cassandra:latest
+    hostname: cassandra2
+    ports:
+      - '7002:7000'
+      - '9043:9042'
+    restart: on-failure  
+    depends_on:
+      - cassandra1  
+    networks:
+      localnet:
+        ipv4_address: 192.168.1.201    
+    volumes:
+      - 'cassandra_data2:/bitnami'
+      - ./cassandra/config/cassandra.conf:/etc/collectd/collectd.conf    
+
+  cassandra3:
+    image: docker.io/bitnami/cassandra:latest
+    hostname: cassandra3
+    ports:
+      - '7003:7000'
+      - '9044:9042'
+    depends_on:
+      - cassandra1
+    restart: on-failure  
+    networks:
+      localnet:
+        ipv4_address: 192.168.1.202  
+    volumes:
+      - 'cassandra_data3:/bitnami'
+      - ./cassandra/config/cassandra.conf:/etc/collectd/collectd.conf 
+
+volumes:
+  cassandra_data1:
+    driver: local
+  cassandra_data2:
+    driver: local
+  cassandra_data3:
+    driver: local
+
+networks:
+  localnet: 
+    driver: bridge
+    ipam:
+      driver: default
+      config:
+        - subnet: 192.168.1.192/28
+
+     
